@@ -1,0 +1,86 @@
+import requests
+import datetime
+from bs4 import BeautifulSoup
+import pandas as pd
+import numpy as np
+import sqlite3
+import os
+url = "https://web.archive.org/web/20230902185326/https://en.wikipedia.org/wiki/List_of_countries_by_GDP_%28nominal%29"
+table_name = "Country_by_GDP"
+table_attribs = ["Country", "GDP_USD_millions"]
+path = os.path.expanduser("~/data engineering projects")
+csv_path = "countries_by_GDP.csv"
+full_csv_path = os.path.join(path, csv_path)
+db_name = "World_economies.db"
+full_db_name_path = os.path.join(path, db_name)
+
+def extract(url, table_attribs):
+    html_page = requests.get(url).content
+    soup = BeautifulSoup(html_page, "html.parser")
+    df = pd.DataFrame(columns= table_attribs)
+    tables = soup.find_all("tbody")
+    rows = tables[2].find_all("tr")
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols)!= 0:
+            if cols[0].find("a") is not None and "—" not in cols[2]:
+                data_dict = {"Country": cols[0].get_text(strip= True),
+                             "GDP_USD_millions": cols[2].get_text(strip= True)}
+                df1 = pd.DataFrame(data_dict, index = [0])
+                df = pd.concat([df, df1], ignore_index= True)
+    return df
+
+
+def transform(df):
+    df["GDP_USD_millions"] = df["GDP_USD_millions"].replace(",", "", regex = True)
+    df["GDP_USD_millions"] = df["GDP_USD_millions"].astype(float)
+    df["GDP_USD_millions"] = np.round(df["GDP_USD_millions"]/1000 ,2)
+    df = df.rename(columns = {"GDP_USD_millions" : "GDP_USD_billions"})
+    return df
+
+
+def load_to_csv(df, csv_path):
+    df.to_csv(csv_path, index = False)
+    return df
+
+
+def load_to_db(df,sql_connection,table_name):
+    df.to_sql(table_name, sql_connection,  if_exists = "replace", index = False)
+    return df
+
+def run_query(query_statement,sql_connection):
+    print(query_statement)
+    query_output = pd.read_sql(query_statement, sql_connection)
+    print(query_output)
+
+def log_progress(message):
+    timestamp_format = "%Y-%m-%d-%H-%M-%S"
+    now = datetime.datetime.now()
+    timestamp = now.strftime(timestamp_format)
+    with open("logtext.txt", "a") as f:
+        f.write(timestamp + "," + message + "\n")
+
+# function calls
+log_progress("etl job started")
+log_progress("Extraction phase started")
+extracted_data = extract(url,table_attribs)
+print("Extracted Data:")
+print(extracted_data.head())
+log_progress("Extraction phase ended")
+log_progress("Transformation phase started")
+transformed_data = transform(extracted_data)
+print("Transformed Data:")
+print(transformed_data.head())
+log_progress("Transformation phase ended")
+log_progress("Load phase started")
+load_to_csv(transformed_data, full_csv_path)
+sql_connection = sqlite3.connect(full_db_name_path)
+load_to_db(transformed_data,sql_connection,table_name)
+log_progress("Load phase ended")
+log_progress("Query phase started")
+run_query(f"SELECT * from {table_name} WHERE GDP_USD_billions >= 100", sql_connection)
+log_progress("Query phase ended")
+sql_connection.close()
+log_progress("etl job finished")
+
+# python3.13 webscrapping_etl_project

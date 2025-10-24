@@ -1,0 +1,10 @@
+2025-10-24-16-10-27,etl job started
+2025-10-24-16-10-27,Extraction phase started
+2025-10-24-16-10-36,Extraction phase ended
+2025-10-24-16-10-36,Transformation phase started
+2025-10-24-16-10-36,Transformation phase ended
+2025-10-24-16-10-36,Load phase started
+2025-10-24-16-10-36,Load phase ended
+2025-10-24-16-10-36,Query phase started
+2025-10-24-16-10-36,Query phase ended
+2025-10-24-16-10-36,etl job finished
