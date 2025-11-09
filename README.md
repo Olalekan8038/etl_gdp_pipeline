@@ -36,7 +36,8 @@ The dataset contains GDP figures for multiple countries along with related econo
    ```bash
    git clone https://github.com/Olalekan8038/etl_gdp_pipeline.git
    cd etl_gdp_pipeline
-2. install dependencies 
+2. install dependencies:
+
 pandas
 numpy
 beautifulsoup4
