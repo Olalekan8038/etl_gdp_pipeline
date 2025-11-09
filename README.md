@@ -37,11 +37,7 @@ The dataset contains GDP figures for multiple countries along with related econo
    git clone https://github.com/Olalekan8038/etl_gdp_pipeline.git
    cd etl_gdp_pipeline
 2. install dependencies:
-
-pandas
-numpy
-beautifulsoup4
-requests
+pandas,numpy,beautifulsoup4 and requests
 3. Run the ETL pipeline 
 python gdp_etl_pipeline.py
 4. open the SQLite database to Query the data:
