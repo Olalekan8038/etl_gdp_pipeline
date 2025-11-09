@@ -46,8 +46,9 @@ python gdp_etl_pipeline.py
 4. open the SQLite database to Query the data:
 sqlite3 World_economies.db
 5. Check the CSV output in the path defined in the script.
-##Output sample below:
-| Country        | GDP_USD_billions |
+## Output sample below:
+
+|  Country       | GDP_USD_billions|
 |----------------|-----------------|
 | United States  | 25000.0         |
 | China          | 18000.0         |
